@@ -31,7 +31,7 @@ a few small extensions.
   "source" : "location or name of service",
   "id" :  "a-unique-id"
   "time" : "2018-04-05T17:31:00Z",
-  "polyntrace" [
+  "polyntrace": [
     {
       "type": "com.some.other.event",
       "time": "2018-04-05T17:31:00Z",
