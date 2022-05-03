@@ -44,7 +44,7 @@ a few small extensions.
     "version": "0.1.0"
   },
   "datacontenttype" : "application/json",
-  "dataschema": "app.spiff.polyn.service.started.v1.schema.v1.json",
+  "dataschema": "app:spiff:polyn:service:started:v1:schema:v1",
   "data" : {}
   }
 }
@@ -110,11 +110,11 @@ The [Cloud Event spec](https://github.com/cloudevents/spec/blob/v1.0.2/cloudeven
 If a Producer updates the schema in a backward-_compatible_ way, there will likely be events of the same `type` with different `dataschema` attributes in the event bus. We don't want this kind of change to break a Consumer. A Consumer should be able to receive events with both `dataschema`, validate against them, and not break. The Consumer should be able to add code to handle data in the new schema at its leisure, or not at all if it's not relevant to the Consumer.
 
 ### Event and Schema Naming
-There is a one-to-many relationship between an event `type` and `dataschema`. One `type` of event could have multiple compatible `dataschema`.
+There is a one-to-many relationship between an event `type` and `dataschema`. One `type` of event could have multiple compatible `dataschema`. A `dataschema` must follow valid [URI syntax](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
 
 The core part of the event `type` should correspond to the `core` part of the JSON schema name, but the versions may be different. For example event `type` `app.spiff.user.created.v1` could be compatible with `dataschema`
-* `app.spiff.user.created.v1.schema.v1.json`
-* `app.spiff.user.created.v1.schema.v2.json`
-* `app.spiff.user.created.v1.schema.v3.json`
+* `app:spiff:user:created:v1:schema:v1`
+* `app:spiff:user:created:v1:schema:v2`
+* `app:spiff:user:created:v1:schema:v3`
 
-Anytime a backwards-_incompatible_ change is introduced the event `type` should change and the schema name version numbers will start over. For example changing the event `type`  to `app.spiff.user.created.v2` would start the `dataschema` over to `app.spiff.user.created.v2.schema.v1.json`
+Anytime a backwards-_incompatible_ change is introduced the event `type` should change and the schema name version numbers will start over. For example changing the event `type`  to `app.spiff.user.created.v2` would start the `dataschema` over to `app:spiff:user:created:v2:schema:v1`
