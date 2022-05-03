@@ -57,3 +57,64 @@ a few small extensions.
   origin
 - **polynclient** - this contains details of the client that published this
   event.
+
+## Naming and Versioning
+
+### Event `type`
+According to the [Version of Cloud Events section](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) any backward-_incompatible_ schema changes need to have a completely different name/URI.
+
+> Consumers who have identified a CloudEvent type will generally expect the data within that type to only change in backwardly-compatible ways
+
+> When a CloudEvent's data changes in a backwardly-incompatible way, the value of the type attribute should generally change. The event producer is encouraged to produce both the old event and the new event for some time (potentially forever) in order to avoid disrupting consumers.
+
+Any changes you make to your dataschema that are backwards-_incompatible_ will require you to change the name of the event `type` and produce both events until no Consumers are using the old `type`. For example if the User Producer was producing an event `type` called `app.spiff.user.created.v1` with a dataschema like this:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "first_name": { "type": "string" },
+    "last_name": { "type": "string" }
+  },
+  "required": ["first_name", "last_name"]
+}
+```
+
+If the User Producer realizes that `first_name` `last_name` doesn't work for all people and updates their schema to be:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+  },
+  "required": ["name"]
+}
+```
+
+You would need to update the name of the event `type` from `app.spiff.user.created.v1` to `app.spiff.user.created.v2`.
+
+Examples of backwards-_incompatible_ changes include:
+* changing the name of an existing field
+* adding a new required field
+* changing the type of an existing field
+* removing an existing field
+
+Examples of backwards-_compatible_ changes include:
+* Adding a new optional field
+* Adding metadata such as comments, examples, descriptions
+
+### `dataschema`
+The [Cloud Event spec](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) recommends that any kind of change to the schema, backwards compatible or incompatible, should get a change in the `dataschema` attribute even if the `type` stays the same. This means that there is a one-to-many relationship between an event `type` and `dataschema`. One `type` of event could have multiple compatible `dataschema`.
+
+If a Producer updates the schema in a backward-_compatible_ way, there will likely be events of the same `type` with different `dataschema` attributes in the event bus. We don't want this kind of change to break a Consumer. A Consumer should be able to receive events with both `dataschema`, validate against them, and not break. The Consumer should be able to add code to handle data in the new schema at its leisure, or not at all if it's not relevant to the Consumer.
+
+### Event and Schema Naming
+There is a one-to-many relationship between an event `type` and `dataschema`. One `type` of event could have multiple compatible `dataschema`.
+
+The core part of the event `type` should correspond to the `core` part of the JSON schema name, but the versions may be different. For example event `type` `app.spiff.user.created.v1` could be compatible with `dataschema`
+* `app.spiff.user.created.v1.schema.v1.json`
+* `app.spiff.user.created.v1.schema.v2.json`
+* `app.spiff.user.created.v1.schema.v3.json`
+
+Anytime a backwards-_incompatible_ change is introduced the event `type` should change and the schema name version numbers will start over. For example changing the event `type`  to `app.spiff.user.created.v2` would start the `dataschema` over to `app.spiff.user.created.v2.schema.v1.json`
