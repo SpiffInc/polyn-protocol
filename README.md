@@ -118,3 +118,5 @@ The core part of the event `type` should correspond to the `core` part of the JS
 * `app:spiff:user:created:v1:schema:v3`
 
 Anytime a backwards-_incompatible_ change is introduced the event `type` should change and the schema name version numbers will start over. For example changing the event `type`  to `app.spiff.user.created.v2` would start the `dataschema` over to `app:spiff:user:created:v2:schema:v1`
+
+While the `dataschema` value should be a valid [URI syntax](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). The file name should look like this: `app.spiff.user.created.v1.schema.v1.json` with the colons replaced by `.` and the file extension `.json` added to the end
