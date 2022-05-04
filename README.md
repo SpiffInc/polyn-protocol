@@ -119,4 +119,9 @@ The core part of the event `type` should correspond to the `core` part of the JS
 
 Anytime a backwards-_incompatible_ change is introduced the event `type` should change and the schema name version numbers will start over. For example changing the event `type`  to `app.spiff.user.created.v2` would start the `dataschema` over to `app:spiff:user:created:v2:schema:v1`
 
-While the `dataschema` value should be a valid [URI syntax](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). The file name should look like this: `app.spiff.user.created.v1.schema.v1.json` with the colons replaced by `.` and the file extension `.json` added to the end
+While the `dataschema` value should be a valid [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). The file name should look like this: `app.spiff.user.created.v1.schema.v1.json` with the colons replaced by `.` and the file extension `.json` added to the end
+
+## Validation
+
+Every event will require the `dataschema` property be populated. With a valid [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) that points to a JSON file that follows the [JSON Schema](https://json-schema.org/) specification.  This differs from the [CloudEvents](https://github.com/cloudevents) which says `dataschema` can be optional. Polyn aims to ensure every event is explicit about what format its data takes. Even if the schema is just `{ "type" => "null" }` we want the event to be explicit that it can have no data so that Consumers know that an empty paylod is not an accident. Even events that are not being serialized as JSON (e.g. Avro, Kafka, etc) should use the [JSON Schema](https://json-schema.org/) to validate the format of their `data` property.
+
