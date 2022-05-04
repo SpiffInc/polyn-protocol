@@ -29,7 +29,7 @@ a few small extensions.
   "specversion" : "1.0.1",
   "type" : "com.some.event",
   "source" : "location or name of service",
-  "id" :  "a-unique-id"
+  "id" :  "a-unique-id",
   "time" : "2018-04-05T17:31:00Z",
   "polyntrace": [
     {
@@ -40,7 +40,7 @@ a few small extensions.
   ],
   "polynclient": {
     "lang": "ruby",
-    "langversion": "3.2.1"
+    "langversion": "3.2.1",
     "version": "0.1.0"
   },
   "datacontenttype" : "application/json",
@@ -124,4 +124,8 @@ While the `dataschema` value should be a valid [URI](https://en.wikipedia.org/wi
 ## Validation
 
 Every event will require the `dataschema` property be populated. With a valid [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) that points to a JSON file that follows the [JSON Schema](https://json-schema.org/) specification.  This differs from the [CloudEvents](https://github.com/cloudevents) which says `dataschema` can be optional. Polyn aims to ensure every event is explicit about what format its data takes. Even if the schema is just `{ "type" => "null" }` we want the event to be explicit that it can have no data so that Consumers know that an empty paylod is not an accident. Even events that are not being serialized as JSON (e.g. Avro, Kafka, etc) should use the [JSON Schema](https://json-schema.org/) to validate the format of their `data` property.
+
+### Errors
+
+When validation errors happen, either on the Producer or Consumer side, Polyn implementations will raise an error. The advantage of raising an error when validations fail is that monitoring and alerting tools will have an obvious indication that an event contract has been broken at the exact time that it happens. This makes it much easier to respond to problems quickly and debug them easily. The opposite of this would be to catch the error and allow the Consumer/Producer to decide what to do with it. This gives the Consumer/Producer more of a chance to recover from a broken contract, but increases the likelihood that a failure will happen in a more accidental, unpredictable, harder-to-debug way. If the event isn't adhering to the contract something is probably going to break so we might as well control it so we can address the issue faster.
 
