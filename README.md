@@ -135,7 +135,7 @@ Every service that uses Polyn needs to publish the events and schemas it produce
 
 ### `polyn.started` event
 
-When a Polyn application starts, after it has run any schema migrations, it should publish an event called `<reverse.domain>.polyn.started` (e.g. `app.spiff.polyn.started`) and it should look like this:
+When a Polyn application starts it should publish an event called `<reverse.domain>.polyn.started` (e.g. `app.spiff.polyn.started`) and it should look like this:
 
 ```json
 {
