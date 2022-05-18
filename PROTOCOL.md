@@ -57,6 +57,8 @@ JSON version of the spec.
 }
 ```
 
+j
+
 ### CloudEvents Extensions
 
 Polyn Clients MUST implement the following extensions.
@@ -114,3 +116,20 @@ client SHOULD NOT however fail to consume the event if the `polynclient` extensi
   "version": "0.1.0"
 }
 ```
+
+### Additional Field Requirements
+
+#### `datacontenttype`
+
+A Polyn client SHOULD add the `datacontenttype` field as defined [here](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#datacontenttype)
+before publishing events that correctly match the content type of the `data` field. It MUST at a
+minimum be able to serialize and deserialize the `application/json` content type.
+
+If the `datacontenttype` is not present in the event, a Polyn client MUST assume that the content
+type is `application/json`. If the data cannot be deserialized, the client MUST broadcast an
+[appropriate error]().
+
+#### `data`
+
+A Polyn client MUST add its event data to the `data` attribute of the CloudEvent. The data format
+must match the `datacontentype` field.
