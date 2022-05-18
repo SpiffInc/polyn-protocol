@@ -137,7 +137,7 @@ must match the `datacontentype` field.
 
 ## Message Validation
 
-### Schema Repository
+### JSON Schema
 
 A Polyn client MUST support loading a JSON Schema document for each event. It MUST wrap the event
 schema into a valid CloudEvent JSON Schema, and publish that schema to the Schema Repository.
@@ -171,33 +171,22 @@ The full schema document MUST be:
 
 ```json
 {
-  "specversion": "1.0.1",
-  "type": "calc.mult.v1",
-  "source": "location or name of service",
-  "id": "<uuid>",
-  "time": "2018-04-05T17:31:00Z",
-  "polyntrace": [
-    {
-      "type": "<topic>",
-      "time": "2018-04-05T17:31:00Z",
-      "id": "<uuid>"
-    }
-  ],
-  "polynclient": {
-    "lang": "ruby",
-    "langversion": "3.2.1",
-    "version": "0.1.0"
-  },
-  "datacontenttype": "application/json",
-  "data": {
-    "type": "object",
-    "required": ["a", "b"],
-    "properties": {
-      "a": {
-        "type": "integer"
-      },
-      "b": {
-        "type": "integer"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/cloudevents/spec/v1.0.1/spec.json",
+  "properties": {
+    "datacontentype": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": ["a", "b"],
+      "properties": {
+        "a": {
+          "type": "integer"
+        },
+        "b": {
+          "type": "integer"
+        }
       }
     }
   }
@@ -206,13 +195,13 @@ The full schema document MUST be:
 
 #### Schema Backwards Compatibility
 
-A Polyn client SHOULD check the Schema Repository for events of the same name before publishing its
-events to the repository. It SHOULD validate that the events to be published are backwards
-compatible with the events
+A Polyn client SHOULD check the Schema Repository for event schema of the same name before
+publishing its events to the repository. It SHOULD validate that the event schema to be published
+are backwards compatible with the schema
 
 Changes considered to break backwards compatibility are considered to be:
 
 - removing or renaming fields, including deep changes within objects
 - changing field data types
 
-Adding fields is considered to be a backwards compatible change.
+Adding fields SHOULD be considered to be a backwards compatible change.
