@@ -189,7 +189,17 @@ The full schema document MUST be:
         }
       }
     }
-  }
+  },
+  "required": [
+    "id",
+    "type",
+    "polynclient",
+    "polyntrace",
+    "specversion",
+    "datacontenttype",
+    "time",
+    "data"
+  ]
 }
 ```
 
