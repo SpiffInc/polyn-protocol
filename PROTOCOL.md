@@ -18,6 +18,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
   triggered as the result of consuming a subscribed event.
 - **topic** - a reverse domain name representing a unique event.
 - **uuid** - a [UUID v4](https://datatracker.ietf.org/doc/html/rfc4122) compliant UUID.
+- **Schema Repository** - a NATS KeyValue backed store of all events published by registered Polyn
+  services.
 
 ## Message Format
 
@@ -51,7 +53,6 @@ JSON version of the spec.
     "version": "0.1.0"
   },
   "datacontenttype" : "application/json",
-  "dataschema": "app:spiff:polyn:service:started:v1:schema:v1",
   "data" : {}
   }
 }
@@ -133,3 +134,85 @@ type is `application/json`. If the data cannot be deserialized, the client MUST 
 
 A Polyn client MUST add its event data to the `data` attribute of the CloudEvent. The data format
 must match the `datacontentype` field.
+
+## Message Validation
+
+### Schema Repository
+
+A Polyn client MUST support loading a JSON Schema document for each event. It MUST wrap the event
+schema into a valid CloudEvent JSON Schema, and publish that schema to the Schema Repository.
+
+#### Schema Repository
+
+A Polyn client MUST publish all event schema to the Schema Repository. The repository MUST be a
+NATS KeyValue store on the same NATS server or cluster that is providing the Message Bus. The
+schema MUST be stored as JSON strings keyed by the event type, i.e. `calc.mult.v1`.
+
+#### Schema Format
+
+Example, if the data schema within `calc.mult.v1.json`:
+
+```json
+{
+  "type": "object",
+  "required": ["a", "b"],
+  "properties": {
+    "a": {
+      "type": "integer"
+    },
+    "b": {
+      "type": "integer"
+    }
+  }
+}
+```
+
+The full schema document MUST be:
+
+```json
+{
+  "specversion": "1.0.1",
+  "type": "calc.mult.v1",
+  "source": "location or name of service",
+  "id": "<uuid>",
+  "time": "2018-04-05T17:31:00Z",
+  "polyntrace": [
+    {
+      "type": "<topic>",
+      "time": "2018-04-05T17:31:00Z",
+      "id": "<uuid>"
+    }
+  ],
+  "polynclient": {
+    "lang": "ruby",
+    "langversion": "3.2.1",
+    "version": "0.1.0"
+  },
+  "datacontenttype": "application/json",
+  "data": {
+    "type": "object",
+    "required": ["a", "b"],
+    "properties": {
+      "a": {
+        "type": "integer"
+      },
+      "b": {
+        "type": "integer"
+      }
+    }
+  }
+}
+```
+
+#### Schema Backwards Compatibility
+
+A Polyn client SHOULD check the Schema Repository for events of the same name before publishing its
+events to the repository. It SHOULD validate that the events to be published are backwards
+compatible with the events
+
+Changes considered to break backwards compatibility are considered to be:
+
+- removing or renaming fields, including deep changes within objects
+- changing field data types
+
+Adding fields is considered to be a backwards compatible change.
