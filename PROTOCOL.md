@@ -10,16 +10,16 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Definitions
 
-- **application** - a single process that implements one or more services.
+- **application** - a single process that implements one or more components.
 - **event** - any message being published to the transporter by the clients.
 - **message bus** - the NATS Jetstream message bus
-- **services** - an event consumer that implements one or more event endpoints
+- **components** - an event consumer that implements one or more event endpoints
 - **subscriptions** - any endpoint within a service that implements specific business logic to be
   triggered as the result of consuming a subscribed event.
-- **topic** - a reverse domain name representing a unique event.
+- **type** - a reverse domain name representing a unique event.
 - **uuid** - a [UUID v4](https://datatracker.ietf.org/doc/html/rfc4122) compliant UUID.
 - **Schema Repository** - a NATS KeyValue backed store of all events published by registered Polyn
-  services.
+  components.
 
 ## Message Format
 
@@ -36,13 +36,13 @@ JSON version of the spec.
 ```json
 {
   "specversion" : "1.0.1",
-  "type" : "<topic>",
+  "type" : "<type>",
   "source" : "location or name of service",
   "id" :  "<uuid>",
   "time" : "2018-04-05T17:31:00Z",
   "polyntrace": [
     {
-      "type": "<topic>",
+      "type": "<type>",
       "time": "2018-04-05T17:31:00Z",
       "id": "<uuid>"
     }
@@ -73,12 +73,12 @@ missing from the published event.
 ```json
 [
   {
-    "type": "<topic>",
+    "type": "<type>",
     "time": "2018-04-05T14:31:00Z",
     "id": "<uuid>"
   },
   {
-    "type": "<topic>",
+    "type": "<type>",
     "time": "2018-04-05T17:31:00Z",
     "id": "<uuid>"
   }
@@ -93,7 +93,7 @@ trace of the predecessor to the `polyntrace` array.
 ```ruby
 def receive_some_event(context)
   # ... do work
-  context.publish("<topic>", result_of_work)
+  context.publish("<type>", result_of_work)
 end
 ```
 
