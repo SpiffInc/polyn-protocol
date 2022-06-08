@@ -58,8 +58,6 @@ JSON version of the spec.
 }
 ```
 
-j
-
 ### CloudEvents Extensions
 
 Polyn Clients MUST implement the following extensions.
@@ -76,7 +74,6 @@ missing from the published event.
 [
   {
     "type": "<topic>",
-
     "time": "2018-04-05T14:31:00Z",
     "id": "<uuid>"
   },
@@ -142,67 +139,6 @@ must match the `datacontentype` field.
 A Polyn client MUST support loading a JSON Schema document for each event. It MUST wrap the event
 schema into a valid CloudEvent JSON Schema, and publish that schema to the Schema Repository.
 
-#### Schema Repository
-
-A Polyn client MUST publish all event schema to the Schema Repository. The repository MUST be a
-NATS KeyValue store on the same NATS server or cluster that is providing the Message Bus. The
-schema MUST be stored as JSON strings keyed by the event type, i.e. `calc.mult.v1`.
-
-#### Schema Format
-
-Example, if the data schema within `calc.mult.v1.json`:
-
-```json
-{
-  "type": "object",
-  "required": ["a", "b"],
-  "properties": {
-    "a": {
-      "type": "integer"
-    },
-    "b": {
-      "type": "integer"
-    }
-  }
-}
-```
-
-The full schema document MUST be:
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/cloudevents/spec/v1.0.1/spec.json",
-  "properties": {
-    "datacontentype": {
-      "type": "string"
-    },
-    "data": {
-      "type": "object",
-      "required": ["a", "b"],
-      "properties": {
-        "a": {
-          "type": "integer"
-        },
-        "b": {
-          "type": "integer"
-        }
-      }
-    }
-  },
-  "required": [
-    "id",
-    "type",
-    "polynclient",
-    "polyntrace",
-    "specversion",
-    "datacontenttype",
-    "time",
-    "data"
-  ]
-}
-```
-
 #### Schema Backwards Compatibility
 
 A Polyn client SHOULD check the Schema Repository for event schema of the same name before
@@ -215,3 +151,34 @@ Changes considered to break backwards compatibility are considered to be:
 - changing field data types
 
 Adding fields SHOULD be considered to be a backwards compatible change.
+
+### Validation on Publish
+
+A valid Polyn client SHOULD validate events against their respective JSON schema before publishing
+the event to the bus.
+
+### Validation on Receive
+
+A valid Polyn client SHOULD validate events received against their respective JSON schema before
+processing said events.
+
+## NATS JetStream
+
+### Publishing
+
+A Polyn client MUST publish full CloudEevent messages utilizing [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream).
+The subject should the type of the event. For example if the event type were
+`app.widgets.created.v1` the client MUST publish the event to the `app.widgets.created.v1` subject.
+
+### Subscribing
+
+A Polyn client MUST subscribe its components to a [NATS JetStream consumer]()
+whose name is the reverse domain name of the application, suffixed with the component name and
+event type delimited by underscores (`_`).
+
+For example, if the application reverse domain were `app.widgets`, and the component consuming events
+were the `new_widget_notifier` component, and that component was subscribing to `app.widgets.created.v1`,
+the `app_widgets_new_widget_notifier_app_widgets_created_v1`.
+
+A Polyn client MUST NOT attempt to set up its own consumers. This is handled by the [Polybn CLI]()
+within the [events repository]()
