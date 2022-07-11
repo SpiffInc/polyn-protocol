@@ -67,10 +67,10 @@ JSON version of the spec.
       "id": "<uuid>"
     }
   ],
-  "polynclient": {
-    "lang": "ruby",
-    "langversion": "3.2.1",
-    "version": "0.1.0"
+  "polyndata": {
+    "clientlang": "ruby",
+    "clientlangversion": "3.2.1",
+    "clientversion": "0.1.0"
   },
   "datacontenttype" : "application/json",
   "dataschema": "app:spiff:polyn:service:started:v1:schema:v1",
@@ -122,18 +122,19 @@ end
 This would add whatever event that caused `receive_some_event` to be fired to the trace when
 `context.publish` is called.
 
-#### `polynclient`
+#### `polyndata`
 
-This is an object representing the information about the client that published the event. A Polyn
-client SHOULD NOT however fail to consume the event if the `polynclient` extension is missing.
+This is an object representing the information about the client that published the event as well as
+additional Polyn data. A Polyn client SHOULD NOT however fail to consume the event if the `polyndata`
+extension is missing.
 
 ##### Example
 
 ```json
 {
-  "lang": "ruby",
-  "langversion": "3.2.1",
-  "version": "0.1.0"
+  "clientlang": "ruby",
+  "clientlangversion": "3.2.1",
+  "clientversion": "0.1.0"
 }
 ```
 
@@ -232,10 +233,10 @@ When a Polyn application starts it should publish an event called `<reverse.doma
   "datacontenttype": "application/json",
   "dataschema": "app:spiff:polyn:started:v1:schema:v1",
   "data": "null",
-  "polynclient": {
-    "lang": "ruby",
-    "langversion": "3.2.1",
-    "version": "0.1.0"
+  "polyndata": {
+    "clientlang": "ruby",
+    "clientlangversion": "3.2.1",
+    "clientversion": "0.1.0"
   },
   "polyntrace": []
 }
