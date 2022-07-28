@@ -27,6 +27,8 @@ https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type
 
 The Cloud Event spec indicates that the event `type` should include the reverse domain name of the organization at the beginning. Most application code should not need to worry about this as the stream subjects and JSON schema files will only have the `event_name` in them.
 
+The `event_name` portion SHOULD be written in past tense ("account registered", "funds transferred", "fraudulent activity detected" etc.)
+
 ## Schema `$id`
 
 ### Format
