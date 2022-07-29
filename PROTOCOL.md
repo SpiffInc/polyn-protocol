@@ -52,7 +52,6 @@ While CloudEvents supports multiple formats, for simplicities sake, Polyn client
   },
   "datacontenttype" : "application/json",
   "data" : {}
-  }
 }
 ```
 
