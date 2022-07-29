@@ -157,8 +157,7 @@ processing said events.
 
 ### Publishing
 
-A Polyn client MUST publish full CloudEevent messages utilizing [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream).
-The subject should the type of the event. For example if the event type were
+A Polyn client MUST publish full CloudEevent messages utilizing [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream). The subject should be the type of the event. For example if the event type were
 `app.widgets.created.v1` the client MUST publish the event to the `app.widgets.created.v1` subject.
 
 ### Subscribing
