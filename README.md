@@ -75,12 +75,17 @@ Once the event has been processed, it is acknowledged, making way for the next e
 
 ### Schema Repository
 
+<<<<<<< HEAD
 When a Polyn application starts, the client publishes all of the event schema for that application
 to the schema repository. Before doing so, it compares the existing schema in the repository for
 the events of the same type, against the schema to be published, and will throw an error if the
 new schema is not backwards compatible with the old.
 
 ### Error Handling
+
+This is an object representing the information about the client that published the event as well as
+additional Polyn data. A Polyn client SHOULD NOT however fail to consume the event if the `polyndata`
+extension is missing.
 
 Because components are stateless, Polyn clients adopt a "let it fail" approach to error handling.
 If an error in processing an event occurs, the clients will simply broadcast a
@@ -91,8 +96,6 @@ compliant [JSON Schema](https://json-schema.org/). Event structure is validated 
 schema both before publishing and after receiving events. The schema represents a contract between
 publisher and subscribers, ensuring events do not mutate in a way that prevents subscribers from
 consuming the events and accomplishing its task.
-
-# TODO - cleanup
 
 ## Naming and Versioning
 
@@ -170,164 +173,3 @@ Every event will require the `dataschema` property be populated. With a valid [U
 ### Errors
 
 When validation errors happen, either on the Producer or Consumer side, Polyn implementations will raise an error. The advantage of raising an error when validations fail is that monitoring and alerting tools will have an obvious indication that an event contract has been broken at the exact time that it happens. This makes it much easier to respond to problems quickly and debug them easily. The opposite of this would be to catch the error and allow the Consumer/Producer to decide what to do with it. This gives the Consumer/Producer more of a chance to recover from a broken contract, but increases the likelihood that a failure will happen in a more accidental, unpredictable, harder-to-debug way. If the event isn't adhering to the contract something is probably going to break so we might as well control it so we can address the issue faster.
-
-## Discoverability
-
-Every service that uses Polyn needs to publish the events and schemas it produces/consumes so that other services can discover and understand them. Event and/or schema changes should be published anytime a service is deployed/comes online so that other services can get updates and be aware of what services are running. The schema events should adhere to the same [CloudEvent Spec](https://github.com/cloudevents/spec) that other events in the system use and follow the same rules. Each Polyn library should take care of setting up the Consumers and Producers for these schema events so that developers can focus on application code unique to their service.
-
-### `polyn.started` event
-
-When a Polyn application starts it should publish an event called `<reverse.domain>.polyn.started` (e.g. `app.spiff.polyn.started`) and it should look like this:
-
-```json
-{
-  "specversion": "1.0.1",
-  "type": "app.spiff.polyn.started.v1",
-  "source": "location or name of service",
-  "id": "a-unique-uuid",
-  "time": "2018-04-05T17:31:00Z",
-  "datacontenttype": "application/json",
-  "dataschema": "app:spiff:polyn:started:v1:schema:v1",
-  "data": "null",
-  "polynclient": {
-    "lang": "ruby",
-    "langversion": "3.2.1",
-    "version": "0.1.0"
-  },
-  "polyntrace": []
-}
-```
-
-#### `polyn.started` data definition schema
-
-```json
-{
-  "$id": "app:spiff:polyn:started:v1:schema:v1",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "type": "null"
-}
-```
-
-### `polyn.publishes_events` event
-
-When a Polyn service starts it should also publish an event called `polyn.publishes_events` that contains the events and schemas the service publishes. An example would be
-
-```json
-{
-  "specversion": "1.0.1",
-  "type": "app.spiff.polyn.publishes_events.v1",
-  "source": "location or name of service",
-  "id": "a-unique-uuid",
-  "time": "2018-04-05T17:31:00Z",
-  "datacontenttype": "application/json",
-  "dataschema": "app:spiff:polyn:publishes_events:v1:schema:v1",
-  "data": {
-    "events": {
-      "app.spiff.user.created.v2": {
-        "app:spiff:user:created:v2:schema:v1": {
-          "$id": "app:spiff:user:created:v2:schema:v1",
-          "$schema": "http://json-schema.org/draft-07/schema",
-          "type": "object",
-          "properties": {
-            "name": { "type": "string" }
-          },
-          "required": ["name"]
-        }
-      },
-      "app.spiff.user.created.v1": {
-        "app:spiff:user:created:v1:schema:v1": {
-          "$id": "app:spiff:user:created:v1:schema:v1",
-          "$schema": "http://json-schema.org/draft-07/schema",
-          "type": "object",
-          "properties": {
-            "first_name": { "type": "string" },
-            "last_name": { "type": "string" }
-          },
-          "required": ["first_name", "last_name"]
-        }
-      }
-    }
-  }
-}
-```
-
-#### `polyn.publishes_events` data definition schema
-
-```json
-{
-  "$id": "app:spiff:polyn:publishes_events:v1:schema:v1",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "type": "object",
-  "properties": {
-    "events": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "object",
-          "propertyNames": {
-            "format": "uri"
-          }
-        }
-      }
-    }
-  },
-  "required": ["events"]
-}
-```
-
-### `polyn.subscribes_events` event
-
-When a Polyn starts it should also publish an event called `polyn.subscribes_events` that contains the events and schemas the service subscribes to. This can help services know when there are no more consumers using an old version of schema or event. An example would be:
-
-```json
-{
-  "specversion": "1.0.1",
-  "type": "app.spiff.polyn.subscribes_events.v1",
-  "source": "location or name of service",
-  "id": "a-unique-uuid",
-  "time": "2018-04-05T17:31:00Z",
-  "datacontenttype": "application/json",
-  "dataschema": "app:spiff:polyn:subscribes_events:v1:schema:v1",
-  "data": {
-    "events": {
-      "app.spiff.company.deleted.v1": {
-        "app:spiff:company:deleted:v1:schema:v1": {
-          "$id": "app:spiff:company:deleted:v1:schema:v1",
-          "$schema": "http://json-schema.org/draft-07/schema",
-          "type": "object",
-          "properties": {
-            "company_id": { "type": "string" }
-          },
-          "required": ["company_id"]
-        }
-      }
-    }
-  }
-}
-```
-
-#### `polyn.subscribes_events` data definition schema
-
-```json
-{
-  "$id": "app:spiff:polyn:subscribes_events:v1:schema:v1",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "type": "object",
-  "properties": {
-    "events": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "object",
-          "propertyNames": {
-            "format": "uri"
-          }
-        }
-      }
-    }
-  },
-  "required": ["events"]
-}
-```
