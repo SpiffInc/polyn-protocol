@@ -12,10 +12,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - **application** - a single process that implements one or more components.
 - **event** - any message being published to the transporter by the clients.
-- **message bus** - the NATS Jetstream message bus
+- **message bus** - the NATS JetStream message bus
 - **components** - an event consumer that implements one or more event endpoints
-- **subscriptions** - any endpoint within a service that implements specific business logic to be
-  triggered as the result of consuming a subscribed event.
+- **subscriptions** - any endpoint within a service that implements specific business logic to be triggered as the result of consuming a subscribed event.
 - **type** - a reverse domain name representing a unique event.
 - **uuid** - a [UUID v4](https://datatracker.ietf.org/doc/html/rfc4122) compliant UUID.
 - **Schema Repository** - a NATS KeyValue backed store of all events published by registered Polyn
@@ -25,11 +24,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 A Polyn client MUST publish events that comply with the
 [CloudEvents JSON](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/formats/json-format.md)
-specification. In addition a client MUST add a`polyntrace` and `polynclient` extension as described
+specification. In addition a client MUST add a `polyntrace` and `polyndata` extension as described
 [here](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/formats/json-format.md#2-attributes).
 
-While CloudEvents supports multiple formats, for simplicities sake, Polyn clients only support the
-JSON version of the spec.
+While CloudEvents supports multiple formats, for simplicities sake, Polyn clients only support the JSON version of the spec.
 
 ### Example
 
@@ -47,10 +45,10 @@ JSON version of the spec.
       "id": "<uuid>"
     }
   ],
-  "polynclient": {
-    "lang": "ruby",
-    "langversion": "3.2.1",
-    "version": "0.1.0"
+  "polyndata": {
+    "clientlang": "ruby",
+    "clientlangversion": "3.2.1",
+    "clientversion": "0.1.0"
   },
   "datacontenttype" : "application/json",
   "data" : {}
@@ -100,18 +98,17 @@ end
 This would add whatever event that caused `receive_some_event` to be fired to the trace when
 `context.publish` is called.
 
-#### `polynclient`
+#### `polyndata`
 
-This is an object representing the information about the client that published the event. A Polyn
-client SHOULD NOT however fail to consume the event if the `polynclient` extension is missing.
+This is an object representing the information about the client that published the event as well as additional metadata. A Polyn client SHOULD NOT however fail to consume the event if the `polyndata` extension is missing.
 
 ##### Example
 
 ```json
 {
-  "lang": "ruby",
-  "langversion": "3.2.1",
-  "version": "0.1.0"
+  "clientlang": "ruby",
+  "clientlangversion": "3.2.1",
+  "clientversion": "0.1.0"
 }
 ```
 
@@ -120,24 +117,19 @@ client SHOULD NOT however fail to consume the event if the `polynclient` extensi
 #### `datacontenttype`
 
 A Polyn client SHOULD add the `datacontenttype` field as defined [here](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#datacontenttype)
-before publishing events that correctly match the content type of the `data` field. It MUST at a
-minimum be able to serialize and deserialize the `application/json` content type.
+before publishing events that correctly match the content type of the `data` field. It MUST at a minimum be able to serialize and deserialize the `application/json` content type.
 
-If the `datacontenttype` is not present in the event, a Polyn client MUST assume that the content
-type is `application/json`. If the data cannot be deserialized, the client MUST broadcast an
-[appropriate error]().
+If the `datacontenttype` is not present in the event, a Polyn client MUST assume that the content type is `application/json`. If the data cannot be deserialized, the client MUST broadcast an [appropriate error]().
 
 #### `data`
 
-A Polyn client MUST add its event data to the `data` attribute of the CloudEvent. The data format
-must match the `datacontentype` field.
+A Polyn client MUST add its event data to the `data` attribute of the CloudEvent. The data format must match the `datacontentype` field.
 
 ## Message Validation
 
 ### JSON Schema
 
-A Polyn client MUST support loading a JSON Schema document for each event. It MUST wrap the event
-schema into a valid CloudEvent JSON Schema, and publish that schema to the Schema Repository.
+A Polyn client MUST support loading a [JSON Schema](https://json-schema.org/) document for each event. It MUST wrap the event schema into a valid CloudEvent JSON Schema, and publish that schema to the Schema Repository. The Schema Repository should be a JetStream KeyValue Bucket called `POLYN_SCHEMAS`. Each event's JSON Schema should be a CloudEvent JSON Schema document with the `data` section replaced with the schema specific to the event.
 
 #### Schema Backwards Compatibility
 

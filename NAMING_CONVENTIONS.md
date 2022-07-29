@@ -25,9 +25,56 @@ https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type
 
 ### Explanation
 
-The Cloud Event spec indicates that the event `type` should include the reverse domain name of the organization at the beginning. Most application code should not need to worry about this as the stream subjects and JSON schema files will only have the `event_name` in them.
+The Cloud Event spec indicates that the event `type` should include the reverse domain name of the organization at the beginning. Most application code should not need to worry about this as the stream subjects and JSON schema files will only have the `<event_name>.<version>` in them.
 
 The `event_name` portion SHOULD be written in past tense ("account registered", "funds transferred", "fraudulent activity detected" etc.)
+
+### Versioning
+
+According to the [Version of Cloud Events section](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) any backward-_incompatible_ schema changes need to have a completely different name/URI.
+
+> Consumers who have identified a CloudEvent type will generally expect the data within that type to only change in backwardly-compatible ways
+
+> When a CloudEvent's data changes in a backwardly-incompatible way, the value of the type attribute should generally change. The event producer is encouraged to produce both the old event and the new event for some time (potentially forever) in order to avoid disrupting consumers.
+
+Any changes you make to your dataschema that are backwards-_incompatible_ will require you to change the name of the event `type` and produce both events until no Consumers are using the old `type`. For example if the User Producer was producing an event `type` called `user.created.v1` with a dataschema like this:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "first_name": { "type": "string" },
+    "last_name": { "type": "string" }
+  },
+  "required": ["first_name", "last_name"]
+}
+```
+
+If the User Producer realizes that `first_name` `last_name` doesn't work for all people and updates their schema to be:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" }
+  },
+  "required": ["name"]
+}
+```
+
+You would need to update the name of the event `type` from `user.created.v1` to `user.created.v2`.
+
+Examples of backwards-_incompatible_ changes include:
+
+- changing the name of an existing field
+- adding a new required field
+- changing the type of an existing field
+- removing an existing field
+
+Examples of backwards-_compatible_ changes include:
+
+- Adding a new optional field
+- Adding metadata such as comments, examples, descriptions
 
 ## Schema `$id`
 
@@ -50,9 +97,9 @@ We want the `$id` of the schema to be the same as the event `type`, but in URI f
 
 ### Examples
 
-`app:spiff:notifications`
-`app:spiff:orders`
-`app:spiff:payments`
+* `app:spiff:notifications`
+* `app:spiff:orders`
+* `app:spiff:payments`
 
 ### References
 https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1
@@ -69,10 +116,10 @@ The `source` of any event MUST be a URI and MUST be unique when combined with th
 
 ### Examples
 
-`ORDERS`
-`ORDERS_NEW`
-`WIDGETS`
-`USERS`
+* `ORDERS`
+* `ORDERS_NEW`
+* `WIDGETS`
+* `USERS`
 
 ### References
 
