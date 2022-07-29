@@ -61,6 +61,27 @@ https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1
 
 The `source` of any event MUST be a URI and MUST be unique when combined with the event id. We want to include the Component/Service name that's producing the event so if there are problems its easier to track down where the event originated.
 
+## Stream Name
+
+### Format
+
+`<STREAM_NAME>`
+
+### Examples
+
+`ORDERS`
+`ORDERS_NEW`
+`WIDGETS`
+`USERS`
+
+### References
+
+https://docs.nats.io/nats-concepts/jetstream/streams
+
+### Explanation
+
+The stream name SHOULD be in all caps with separating underscores. This is the way most of the stream names are shown in the NATS docs so we may as well be consistent with that.
+
 ## Stream Subjects
 
 ### Format
