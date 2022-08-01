@@ -21,7 +21,7 @@ communicate regardless of the language you user.
 
 ## Protocol Documents
 
-* [Protcol](PROTOCOL.md)
+* [Protocol](PROTOCOL.md)
 * [Naming Conventions](NAMING_CONVENTIONS.md)
 * [Extended Cloud Event Schema](cloud-event-schema.json)
 
