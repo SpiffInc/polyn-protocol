@@ -130,6 +130,12 @@ A Polyn client MUST add its event data to the `data` attribute of the CloudEvent
 
 A Polyn client MUST support loading a [JSON Schema](https://json-schema.org/) document for each event. It MUST wrap the event schema into a valid CloudEvent JSON Schema, and publish that schema to the Schema Repository. The Schema Repository should be a JetStream KeyValue Bucket called `POLYN_SCHEMAS`. Each event's JSON Schema should be a CloudEvent JSON Schema document with the `data` section replaced with the schema specific to the event.
 
+If the Schema Respository bucket does not exist Polyn MUST raise an exception that says:
+
+```
+The Schema Store has not been setup on your NATS server. Make sure you use the Polyn CLI to create it"
+```
+
 #### Schema Backwards Compatibility
 
 A Polyn client SHOULD check the Schema Repository for event schema of the same name before
