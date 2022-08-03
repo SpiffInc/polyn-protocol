@@ -136,6 +136,12 @@ If the Schema Respository bucket does not exist Polyn MUST raise an exception th
 The Schema Store has not been setup on your NATS server. Make sure you use the Polyn CLI to create it"
 ```
 
+If there's no schema for the event `type`, Polyn MUST raise an exception that says:
+
+```
+Schema for #{type} does not exist. Make sure it's been added to your `events` codebase and has been loaded into the schema store on your NATS server
+```
+
 #### Schema Backwards Compatibility
 
 A Polyn client SHOULD check the Schema Repository for event schema of the same name before
