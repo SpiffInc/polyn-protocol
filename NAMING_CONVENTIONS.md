@@ -3,10 +3,12 @@
 ## NATS Consumer Name
 
 ### Format
-`<reverse_domain_name>_<component_name>_<event_name>_<version>`
+`<component_name>_<event_name>_<version>`
 
 ### Examples
-`app_spiff_notifications_user_created_v1`
+
+* `notifications_user_created_v1`
+* `orders_backend_user_created_v1`
 
 ### Explanation
 
