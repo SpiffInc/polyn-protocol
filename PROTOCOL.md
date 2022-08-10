@@ -183,12 +183,17 @@ A Polyn client MUST publish full CloudEevent messages utilizing [NATS Jetstream]
 ### Subscribing
 
 A Polyn client MUST subscribe its components to a [NATS JetStream consumer]()
-whose name is the reverse domain name of the application, suffixed with the component name and
-event type delimited by underscores (`_`).
+whose name is component name and event type delimited by underscores (`_`).
 
 For example, if the application reverse domain were `app.widgets`, and the component consuming events
 were the `new_widget_notifier` component, and that component was subscribing to `app.widgets.created.v1`,
-the `app_widgets_new_widget_notifier_app_widgets_created_v1`.
+the `new_widget_notifier_app_widgets_created_v1`.
 
 A Polyn client MUST NOT attempt to set up its own consumers. This is handled by the [Polybn CLI]()
 within the [events repository]()
+
+If a consumer does not exist when attempting to subscribe Polyn MUST raise an exception that says
+
+```
+Consumer {name} does not exist. Use polyn-cli to create it before attempting to subscribe
+```
