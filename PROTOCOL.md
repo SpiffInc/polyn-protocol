@@ -142,6 +142,12 @@ If there's no schema for the event `type`, Polyn MUST raise an exception that sa
 Schema for #{type} does not exist. Make sure it's been added to your `events` codebase and has been loaded into the schema store on your NATS server
 ```
 
+If a received message can't be parsed as JSON, Polyn MUST raise an exception that says:
+
+```
+"Polyn was unable to decode the following message: \n{message}"
+```
+
 #### Schema Backwards Compatibility
 
 A Polyn client SHOULD check the Schema Repository for event schema of the same name before
