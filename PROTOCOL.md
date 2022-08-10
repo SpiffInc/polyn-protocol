@@ -148,6 +148,8 @@ If a received message can't be parsed as JSON, Polyn MUST raise an exception tha
 "Polyn was unable to decode the following message: \n{message}"
 ```
 
+If a received message is not valid and a Consumer is being used to access it, Polyn MUST send an `ACKTERM` to the Consumer so that the message won't be resent
+
 #### Schema Backwards Compatibility
 
 A Polyn client SHOULD check the Schema Repository for event schema of the same name before
