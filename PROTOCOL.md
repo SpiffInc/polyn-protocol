@@ -88,14 +88,13 @@ trace of the predecessor to the `polyntrace` array.
 ##### Example
 
 ```ruby
-def receive_some_event(context)
+def receive_some_event()
   # ... do work
-  context.publish("<type>", result_of_work)
+  Polyn.publish(nats, "<type>", data, triggered_by: prior_event)
 end
 ```
 
-This would add whatever event that caused `receive_some_event` to be fired to the trace when
-`context.publish` is called.
+This would add `prior_event` to the trace when `Polyn.publish` is called.
 
 #### `polyndata`
 
