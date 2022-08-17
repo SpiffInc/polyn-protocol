@@ -88,14 +88,13 @@ trace of the predecessor to the `polyntrace` array.
 ##### Example
 
 ```ruby
-def receive_some_event(context)
+def receive_some_event()
   # ... do work
-  context.publish("<type>", result_of_work)
+  Polyn.publish(nats, "<type>", data, triggered_by: prior_event)
 end
 ```
 
-This would add whatever event that caused `receive_some_event` to be fired to the trace when
-`context.publish` is called.
+This would add `prior_event` to the trace when `Polyn.publish` is called.
 
 #### `polyndata`
 
@@ -142,6 +141,14 @@ If there's no schema for the event `type`, Polyn MUST raise an exception that sa
 Schema for #{type} does not exist. Make sure it's been added to your `events` codebase and has been loaded into the schema store on your NATS server
 ```
 
+If a received message can't be parsed as JSON, Polyn MUST raise an exception that says:
+
+```
+"Polyn was unable to decode the following message: \n{message}"
+```
+
+If a received message is not valid and a Consumer is being used to access it, Polyn MUST send an `ACKTERM` to the Consumer so that the message won't be resent
+
 #### Schema Backwards Compatibility
 
 A Polyn client SHOULD check the Schema Repository for event schema of the same name before
@@ -174,13 +181,18 @@ A Polyn client MUST publish full CloudEevent messages utilizing [NATS Jetstream]
 
 ### Subscribing
 
-A Polyn client MUST subscribe its components to a [NATS JetStream consumer]()
-whose name is the reverse domain name of the application, suffixed with the component name and
-event type delimited by underscores (`_`).
+A Polyn client MUST subscribe its components to a [NATS JetStream consumer](https://docs.nats.io/nats-concepts/jetstream/consumers)
+whose name is component name and event type delimited by underscores (`_`).
 
 For example, if the application reverse domain were `app.widgets`, and the component consuming events
 were the `new_widget_notifier` component, and that component was subscribing to `app.widgets.created.v1`,
-the `app_widgets_new_widget_notifier_app_widgets_created_v1`.
+the `new_widget_notifier_app_widgets_created_v1`.
 
-A Polyn client MUST NOT attempt to set up its own consumers. This is handled by the [Polybn CLI]()
+A Polyn client MUST NOT attempt to set up its own consumers. This is handled by the [Polyn CLI](https://github.com/SpiffInc/polyn-cli)
 within the [events repository]()
+
+If a consumer does not exist when attempting to subscribe Polyn MUST raise an exception that says
+
+```
+Consumer {name} does not exist. Use polyn-cli to create it before attempting to subscribe
+```
