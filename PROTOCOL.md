@@ -176,8 +176,11 @@ processing said events.
 
 ### Publishing
 
-A Polyn client MUST publish full CloudEevent messages utilizing [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream). The subject should be the type of the event. For example if the event type were
+A Polyn client MUST publish full CloudEvent messages utilizing [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream). The subject should be the type of the event. For example if the event type were
 `app.widgets.created.v1` the client MUST publish the event to the `app.widgets.created.v1` subject.
+
+Each message published should include a [`"Nats-Msg-Id"`](https://docs.nats.io/using-nats/developer/develop_jetstream/model_deep_dive#message-deduplication) header to prevent duplicate messages being published.
+The value of the header should be the same id as the CloudEvent id
 
 ### Subscribing
 
