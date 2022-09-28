@@ -24,7 +24,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 A Polyn client MUST publish events that comply with the
 [CloudEvents JSON](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/formats/json-format.md)
-specification. In addition a client MUST add a `polyntrace` and `polyndata` extension as described
+specification. In addition a client MUST add a `polyndata` extension as described
 [here](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/formats/json-format.md#2-attributes).
 
 While CloudEvents supports multiple formats, for simplicities sake, Polyn clients only support the JSON version of the spec.
@@ -38,13 +38,6 @@ While CloudEvents supports multiple formats, for simplicities sake, Polyn client
   "source" : "location or name of service",
   "id" :  "<uuid>",
   "time" : "2018-04-05T17:31:00Z",
-  "polyntrace": [
-    {
-      "type": "<type>",
-      "time": "2018-04-05T17:31:00Z",
-      "id": "<uuid>"
-    }
-  ],
   "polyndata": {
     "clientlang": "ruby",
     "clientlangversion": "3.2.1",
@@ -58,43 +51,6 @@ While CloudEvents supports multiple formats, for simplicities sake, Polyn client
 ### CloudEvents Extensions
 
 Polyn Clients MUST implement the following extensions.
-
-#### `polyntrace`
-
-This is an array of trace objects that identify the chain of events that lead the current event to
-being published. A Polyn client SHOULD NOT fail to consume an event however if `polyntrace` is
-missing from the published event.
-
-##### Example
-
-```json
-[
-  {
-    "type": "<type>",
-    "time": "2018-04-05T14:31:00Z",
-    "id": "<uuid>"
-  },
-  {
-    "type": "<type>",
-    "time": "2018-04-05T17:31:00Z",
-    "id": "<uuid>"
-  }
-]
-```
-
-A Polyn client MUST provide a way to publish an event as the result of a prior event, adding the
-trace of the predecessor to the `polyntrace` array.
-
-##### Example
-
-```ruby
-def receive_some_event()
-  # ... do work
-  Polyn.publish(nats, "<type>", data, triggered_by: prior_event)
-end
-```
-
-This would add `prior_event` to the trace when `Polyn.publish` is called.
 
 #### `polyndata`
 
