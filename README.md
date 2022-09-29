@@ -24,6 +24,7 @@ communicate regardless of the language you user.
 * [Protocol](PROTOCOL.md)
 * [Naming Conventions](NAMING_CONVENTIONS.md)
 * [Testing](TESTING.md)
+* [Observability](OBSERVABILITY.md)
 * [Extended Cloud Event Schema](cloud-event-schema.json)
 
 ## Parts of a Polyn Environment
