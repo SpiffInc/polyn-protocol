@@ -146,3 +146,7 @@ For example if you had a batch of 3 messages of the type `user.created.v1` you w
 │                                                                │
 └────────────────────────────────────────────────────────────────┘
 ```
+
+### Exceptions
+
+If there are any validation errors either when publishing or subscribing, the exception MUST be recorded on the span. Some OpenTelemetry libraries do this automatically, others do not.
