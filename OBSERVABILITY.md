@@ -147,6 +147,82 @@ For example if you had a batch of 3 messages of the type `user.created.v1` you w
 └────────────────────────────────────────────────────────────────┘
 ```
 
+### Request-Reply
+
+#### Span Hierarchy
+
+The span hierarchy for the request should be: `<event_type> send` -> `<event_type> receive` -> `(temporary) send` -> `(temporary) receive`
+
+#### Request Publish
+
+The publishing of the requests SHOULD follow the same format as other published messages
+
+#### Request Handler
+
+The subscribing to requests SHOULD follow the same format as other subscriptions.
+
+#### Response Publish
+
+##### Span Name
+
+The span name for the code that publishes a response for a request should be:
+
+`(temporary) send`
+
+This follows the [OpenTelemetry guidance](https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/messaging/#span-name) on temporary destinations. When a request is made a temporary "inbox" is created for the `reply_to` header. This "inbox" is the subject that the response publishing code will publish to
+
+##### Span Kind
+
+The span kind for the code that handles a response should be `PRODUCER`
+
+##### Attributes
+
+The span attributes for the code that handles a response message should contain at least:
+
+```
+"messaging.system"                     => "NATS",
+"messaging.destination"                => "(temporary)",
+"messaging.protocol"                   => "Polyn",
+"messaging.url"                        => <connected_nats_server_url>,
+"messaging.message_id"                 => <event_id>,
+"messaging.message_payload_size_bytes" => <byte_size_of_event_data>
+```
+
+##### Span Parent
+
+The span parent for publishing a response will be the span that subscribed and received the request
+
+#### Response Handler
+
+##### Span Name
+
+The span name for the code that handles the response of the request should be:
+
+`(temporary) receive`
+
+This follows the [OpenTelemetry guidance](https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/messaging/#span-name) on temporary destinations. When a request is made a temporary "inbox" is created for the `reply_to` header. This "inbox" is the subject that the response handling code is subscribed to.
+
+##### Span Kind
+
+The span kind for the code that handles a response should be `CONSUMER`
+
+##### Attributes
+
+The span attributes for the code that handles a response message should contain at least:
+
+```
+"messaging.system"                     => "NATS",
+"messaging.destination"                => "(temporary)",
+"messaging.protocol"                   => "Polyn",
+"messaging.url"                        => <connected_nats_server_url>,
+"messaging.message_id"                 => <event_id>,
+"messaging.message_payload_size_bytes" => <byte_size_of_event_data>
+```
+
+##### Span Parent
+
+The span parent for the code that handles a response should be extracted from the [`traceparent`](https://www.w3.org/TR/trace-context/#traceparent-header) header in the received message. This will likely be accomplishable using an OpenTelemetry library's [TextMapPropagator Module](https://opentelemetry.io/docs/reference/specification/context/api-propagators/#textmap-propagator). The span hierarchy for the request should be: Request Publish -> Request Handler -> Response Publish -> Response Handler
+
 ### Exceptions
 
 If there are any validation errors either when publishing or subscribing, the exception MUST be recorded on the span. Some OpenTelemetry libraries do this automatically, others do not.
